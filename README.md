@@ -1,7 +1,8 @@
 # Automated remote sensing of artificial water impoundments and their ecological impacts in arid ephemeral rivers
 
 **Author:** Aidan Byrne  
-**Date:** October 2026
+**Last updated:** 03/11/2026
+**Contact:** aidan.byrne@ioz.ac.uk
 
 ---
 
@@ -80,7 +81,7 @@ All baseline vector layers are provided in open-standard GeoPackage (`.gpkg`) fo
 * **Hydrological Networks & Drainage Topography:**
   * `Ugab_HydroRIVERS_Network.gpkg`: HydroRIVERS vector reach segments within the Ugab basin providing network topology (`NEXT_DOWN`) and upland catchment areas (`UPLAND_SKM`) (Step 10).
   * `Ugab_MERIT_Hydro_UPA.tif`: High-resolution (3-arcsecond / ~90 m) MERIT Hydro Upstream Contributing Area raster used to vectorize active channel flowlines (Step 11).
-  * `Ugab_Mask_Major_Rivers.gpkg`: MERIT Hydro trunk river channels (upstream area $> 100\,\text{km}^2$) used to mask out in-channel gravel bar false positives (Step 05).
+  * `Ugab_Mask_Major_Rivers.gpkg`: MERIT Hydro trunk river channels used to mask out in-channel false positives (Step 05).
 * **Ancillary Spatial Exclusion Masks (Ugab Basin):**
   * `Ugab_Mask_Mining.gpkg`: Global mining polygons database subset to exclude open-pit mines and tailings dams (Step 05).
   * `Ugab_Mask_Lakes.gpkg`: HydroLAKES dataset subset to eliminate natural permanent water bodies (Step 05).
@@ -97,13 +98,13 @@ All baseline vector layers are provided in open-standard GeoPackage (`.gpkg`) fo
 
 1. **`01_GEE_PointPixel_Extraction.py`**: Extracts 21 multi-sensor optical (Sentinel-2), SAR backscatter (Sentinel-1), and topographical features (NASADEM slope, MERIT HAND) across ground-truth dams ($n = 1,159$), hard negatives from all iterative testing rounds ($n = 1,300$), and dynamically sampled ESA WorldCover background points in the Swakop River basin via Google Earth Engine.
 2. **`02_DecisionTree_Optimization.py`**: Trains a depth-constrained, interpretable decision tree classifier on the point-pixel training dataset to identify optimal optical-radar split thresholds for surface water detection.
-3. **`03_Topography_Distributions.py`**: Evaluates empirical slope and HAND frequency distributions between true dams and false positives to define upper terrain thresholds (slope $\le 8^\circ$, HAND $\le 12\text{ m}$) that eliminate mountain shadows and upland noise.
+3. **`03_Topography_Distributions.py`**: Evaluates empirical slope and HAND frequency distributions between true dams and false positives to define upper terrain thresholds that eliminate mountain shadows and upland noise.
 4. **`04_GEE_Dam_Detection_Export.py`**: Applies the multi-pathway decision rules and topographical constraints across the entire Ugab River basin in Google Earth Engine and exports candidate water pixels as a GeoTIFF.
 5. **`05_Spatial_PostProcessing.py`**: Vectorizes candidate pixels, applies spatial clustering (100 m buffer merge), excludes non-dam water bodies and urban infrastructure via ancillary masks, and verifies terrain attributes via GEE centroid sampling.
 6. **`06_GEE_Dam_MNDWI_TimeSeries.py`**: Extracts multi-decadal annual wet-season maximum MNDWI time series for all candidate dams from Sentinel-2 (2016–2026) and Landsat 5/7/8/9 (1990–2026) in Earth Engine.
 7. **`07_Filter_Roofs_and_Roads.py`**: Filters candidate polygons using multi-year Sentinel-2 MNDWI dynamics (variance, amplitude, and step-change thresholds) to eliminate smooth, highly reflective anthropogenic surfaces such as metal roofs and asphalt roads.
-8. **`08_Sensor_Accuracy_and_Trends.py`**: Evaluates cross-sensor inundation agreement between 30-m Landsat and 10-m Sentinel-2, identifies the historical establishment year for each verified dam (MNDWI $> 0.05$), and exports the cleaned Landsat time series.
-9. **`09_GEE_Basin_Rainfall.py`**: Extracts the 37-year (1990–2026) annual CHIRPS rainfall time series across the Ugab basin in Earth Engine to contextualize construction tempos against macro-climatic droughts and pluvials.
+8. **`08_Sensor_Accuracy_and_Trends.py`**: Evaluates cross-sensor inundation agreement between 30-m Landsat and 10-m Sentinel-2, identifies the historical establishment year for each verified dam, and exports the cleaned Landsat time series.
+9. **`09_GEE_Basin_Rainfall.py`**: Extracts the 37-year (1990–2026) annual CHIRPS rainfall time series across the Ugab basin in Earth Engine to contextualize construction tempos against macro-climatic conditions.
 10. **`10_Structural_Blockage.py`**: Snaps verified impoundments to the HydroRIVERS drainage network, traverses the directed graph downstream, and calculates cumulative upstream impoundment burden for each river segment.
 11. **`11_Vectorize_MERIT_Rivers.py`**: Masks and vectorizes high-resolution MERIT Hydro flowlines (upstream contributing area $> 10\text{ km}^2$) to accurately delineate active braided ephemeral river channels.
 12. **`12_Delineate_River_Reaches.py`**: Delineates 414 sequential ~1-km downstream evaluation reaches (Near, Mid, Far) below dams and samples 100 geographically matched pristine reference reaches, fusing corridors with MERIT Hydro flowlines.
