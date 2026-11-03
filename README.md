@@ -15,7 +15,7 @@ This repository contains the end-to-end computational workflow and analysis scri
 ## Repository Structure
 
 ```text
-├── Cleaned scripts/                      # Sequential analysis scripts (01 to 16)
+├── Scripts/                      # Sequential analysis scripts (01 to 16)
 │   ├── 01_GEE_PointPixel_Extraction.py
 │   ├── 02_DecisionTree_Optimization.py
 │   ├── 03_Topography_Distributions.py
