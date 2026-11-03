@@ -54,7 +54,9 @@ Several scripts interface directly with Google Earth Engine (GEE). Before runnin
 ```bash
 earthengine authenticate
 ```
-In scripts interacting with GEE (Steps 01, 04, 05, 06, 09, 13, and 14), replace the placeholder `GEE_PROJECT = 'YOUR_GEE_PROJECT'` with your active Google Cloud / Earth Engine project ID.
+In scripts interacting with GEE (Steps 01, 04, 05, 06, 09, 13, and 14), replace the placeholder `GEE_PROJECT = 'YOUR_GEE_PROJECT'` with your active Google Cloud / Earth Engine project ID.  
+
+Note: This workflow utilises datasets and functions native to Google Earth Engine and is subject to change with backend and software updates.
 
 ---
 
