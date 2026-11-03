@@ -1,7 +1,7 @@
 # Automated remote sensing of artificial water impoundments and their ecological impacts in arid ephemeral rivers
 
 **Author:** Aidan Byrne  
-**Last updated:** 03/11/2026
+**Last updated:** 03/11/2026  
 **Contact:** aidan.byrne@ioz.ac.uk
 
 ---
