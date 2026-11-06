@@ -6,7 +6,7 @@ Manuscript Section: 2.5.2 Vegetation and rainfall data
 
 Description:
   1. Traces the complete downstream flow paths from all snapped impoundments
-     to the main Ugab River stem, extracting 414 sequential ~1-km river segments:
+     to the main Ugab River stem, extracting 414 sequential river segments:
      - Near: First immediate downstream reach
      - Mid:  Second downstream reach
      - Far:  Third downstream reach
