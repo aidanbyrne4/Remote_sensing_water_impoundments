@@ -15,7 +15,6 @@ Description:
      Strahler stream order. Total evaluation sample = 514 river reaches.
   3. Fuses the HydroRIVERS network corridors with high-resolution MERIT Hydro
      flowlines (from Step 11) to accurately trace active ephemeral channel beds.
-  4. Generates an interactive Folium web map for visual audit.
 
 Inputs:
   - 'Data/Ugab_Rivers_Cumulative_Blockage.shp' (from Step 10)
@@ -26,7 +25,6 @@ Inputs:
 
 Outputs:
   - 'Data/Ugab_Downstream_Reaches_514.geojson' (Core reach geometry for Steps 13, 14, 15)
-  - 'Data/Proposed_All_Dams_Map.html'
 ================================================================================
 """
 
@@ -37,7 +35,6 @@ import pandas as pd
 import geopandas as gpd
 import shapely
 import networkx as nx
-import folium
 
 warnings.filterwarnings('ignore')
 
@@ -57,7 +54,6 @@ dam_shp_path = os.path.join(DATA_DIR, 'Ugab_Cleaned_Dams_Final.shp')
 
 # Output file paths
 geojson_out = os.path.join(DATA_DIR, 'Ugab_Downstream_Reaches_514.geojson')
-map_out = os.path.join(DATA_DIR, 'Proposed_All_Dams_Map.html')
 
 print(f"Loading rivers from: {rivers_path}")
 rivers = gpd.read_file(rivers_path)
@@ -195,46 +191,3 @@ zones_gdf.geometry = shapely.force_2d(zones_gdf.geometry)
 zones_gdf.to_file(geojson_out, driver='GeoJSON')
 print(f"Reach geometries saved to: {geojson_out}")
 print(f"Centroid buffer fallback applied for: {fallback_count} / {len(final_zones)} reaches without intersected MERIT flowlines.")
-
-# ============================================================
-# 5. GENERATE INTERACTIVE FOLIUM AUDIT MAP
-# ============================================================
-print("Generating interactive web map for spatial auditing...")
-m = folium.Map(location=[-21.0, 14.8], zoom_start=8, tiles=None)
-folium.TileLayer(
-    tiles='https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',
-    attr='Esri Satellite', name='Esri Satellite'
-).add_to(m)
-
-fg_treated = folium.FeatureGroup(name='Treated Reaches (Near / Mid / Far)', show=True)
-fg_placebos = folium.FeatureGroup(name='Reference Reaches (Non-Dammed)', show=True)
-fg_dams = folium.FeatureGroup(name='Active Impoundments', show=True)
-
-def get_style(feature):
-    typ = feature['properties']['type']
-    if typ == 'Placebo':
-        return {'color': '#33a02c', 'fillColor': '#b2df8a', 'weight': 2, 'opacity': 0.8}
-    else:
-        return {'color': '#e31a1c', 'fillColor': '#fb9a99', 'weight': 2, 'opacity': 0.8}
-
-treated_zones = zones_gdf[zones_gdf['type'] != 'Placebo']
-placebo_zones = zones_gdf[zones_gdf['type'] == 'Placebo']
-
-folium.GeoJson(treated_zones, style_function=get_style, tooltip=folium.features.GeoJsonTooltip(fields=['type', 'HYRIV_ID'])).add_to(fg_treated)
-folium.GeoJson(placebo_zones, style_function=get_style, tooltip=folium.features.GeoJsonTooltip(fields=['type', 'HYRIV_ID'])).add_to(fg_placebos)
-
-# Overlay dams
-dam_shp = gpd.read_file(dam_shp_path).to_crs(epsg=4326)
-dam_id_col = 'id' if 'id' in dam_shp.columns else 'FID'
-dam_shp = dam_shp[dam_shp[dam_id_col].isin(valid_dams[id_col_snapped])]
-
-for _, row in dam_shp.iterrows():
-    c = row['geometry'].centroid
-    folium.CircleMarker(location=[c.y, c.x], radius=3.5, color='black', fill=True, fill_opacity=1.0, tooltip="Dam").add_to(fg_dams)
-
-m.add_child(fg_treated)
-m.add_child(fg_placebos)
-m.add_child(fg_dams)
-folium.LayerControl().add_to(m)
-m.save(map_out)
-print(f"Interactive audit map saved to: {map_out}")
