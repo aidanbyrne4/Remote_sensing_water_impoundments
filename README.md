@@ -43,7 +43,7 @@ This repository contains the end-to-end computational workflow and analysis scri
 - **Python Version:** Python `>= 3.9`
 - **Required Libraries:**
   ```bash
-  pip install earthengine-api geopandas rasterio shapely pandas numpy scipy scikit-learn networkx matplotlib seaborn folium linearmodels
+  pip install earthengine-api geopandas rasterio shapely pandas numpy scipy scikit-learn networkx matplotlib seaborn linearmodels
   ```
 
 ---
